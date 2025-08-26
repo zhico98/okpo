@@ -1,13 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-
 interface LeaderboardModalProps {
   onClose: () => void
   isMobile: boolean
-  scores?: Array<{ player_name: string; score: number }>
-  onRefresh?: () => void
 }
 
 interface ScoreEntry {
@@ -15,22 +10,15 @@ interface ScoreEntry {
   score: number
 }
 
-export default function LeaderboardModal({ onClose, isMobile, scores = [], onRefresh }: LeaderboardModalProps) {
-  const [loading, setLoading] = useState(false)
-  const [refreshing, setRefreshing] = useState(false)
+const FAKE_SCORES: ScoreEntry[] = [
+  { player_name: "子阳", score: 2087 },
+  { player_name: "浩然", score: 1923 },
+  { player_name: "君尧", score: 1756 },
+  { player_name: "死的", score: 1542 },
+  { player_name: "明泽", score: 1234 },
+]
 
-  const handleRefresh = async () => {
-    try {
-      setRefreshing(true)
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      if (onRefresh) {
-        onRefresh()
-      }
-    } finally {
-      setRefreshing(false)
-    }
-  }
-
+export default function LeaderboardModal({ onClose, isMobile }: LeaderboardModalProps) {
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-2">
       <div
@@ -49,66 +37,30 @@ export default function LeaderboardModal({ onClose, isMobile, scores = [], onRef
           全球排行榜
         </h2>
 
-        {refreshing ? (
-          <div className="text-center mb-6">
-            <div className="inline-block w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin mb-4"></div>
-            <p
-              className="text-white text-center"
-              style={{
-                fontFamily: '"8-BIT WONDER", monospace',
-              }}
+        <div className="space-y-2 mb-6">
+          {FAKE_SCORES.map((entry, index) => (
+            <div
+              key={index}
+              className="flex justify-between items-center bg-gray-800 p-3 rounded-md border border-gray-600"
             >
-              加载中...
-            </p>
-          </div>
-        ) : scores.length === 0 ? (
-          <p
-            className="text-white text-center mb-6"
-            style={{
-              fontFamily: '"8-BIT WONDER", monospace',
-            }}
-          >
-            暂无分数
-          </p>
-        ) : (
-          <div className="space-y-2 mb-6">
-            {scores.slice(0, 10).map((entry, index) => (
-              <div
-                key={index}
-                className="flex justify-between items-center bg-gray-800 p-3 rounded-md border border-gray-600"
+              <span
+                className="text-white font-bold"
+                style={{
+                  fontFamily: '"8-BIT WONDER", monospace',
+                }}
               >
-                <span
-                  className="text-white font-bold"
-                  style={{
-                    fontFamily: '"8-BIT WONDER", monospace',
-                  }}
-                >
-                  {index + 1}. {entry.player_name}
-                </span>
-                <span
-                  className="text-white font-bold"
-                  style={{
-                    fontFamily: '"8-BIT WONDER", monospace',
-                  }}
-                >
-                  {entry.score}
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
-        <div className="text-center">
-          <Button
-            onClick={handleRefresh}
-            disabled={refreshing}
-            className={`bg-gray-800 hover:bg-gray-700 text-white font-bold border border-gray-600 ${isMobile ? "px-4 py-2" : "px-6 py-3"} shadow-lg disabled:opacity-50`}
-            style={{
-              fontFamily: '"8-BIT WONDER", monospace',
-              boxShadow: "0 4px 8px rgba(0,0,0,0.3)",
-            }}
-          >
-            刷新排行榜
-          </Button>
+                {index + 1}. {entry.player_name}
+              </span>
+              <span
+                className="text-white font-bold"
+                style={{
+                  fontFamily: '"8-BIT WONDER", monospace',
+                }}
+              >
+                {entry.score}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
     </div>

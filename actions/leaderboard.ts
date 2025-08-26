@@ -1,5 +1,4 @@
-// Simple in-memory storage for leaderboard (fallback solution)
-let leaderboardData = [{ player_name: "ROYCE", score: 666, wallet_address: null }]
+import { supabase } from "@/lib/supabase/client"
 
 export async function saveScore(formData: FormData) {
   const playerName = formData.get("playerName") as string
@@ -11,13 +10,16 @@ export async function saveScore(formData: FormData) {
   }
 
   try {
-    leaderboardData.push({
+    const { error } = await supabase.from("leaderboard").insert({
       player_name: playerName,
       score: score,
       wallet_address: walletAddress || null,
     })
 
-    leaderboardData = leaderboardData.sort((a, b) => b.score - a.score).slice(0, 10)
+    if (error) {
+      console.error("Supabase error:", error)
+      return { success: false, message: "Failed to save score to database." }
+    }
 
     return { success: true, message: "Score saved successfully!" }
   } catch (error) {
@@ -28,7 +30,18 @@ export async function saveScore(formData: FormData) {
 
 export async function getLeaderboardScores() {
   try {
-    return leaderboardData.sort((a, b) => b.score - a.score).slice(0, 10)
+    const { data, error } = await supabase
+      .from("leaderboard")
+      .select("*")
+      .order("score", { ascending: false })
+      .limit(10)
+
+    if (error) {
+      console.error("Supabase error:", error)
+      return []
+    }
+
+    return data || []
   } catch (error) {
     console.error("Error fetching leaderboard scores:", error)
     return []

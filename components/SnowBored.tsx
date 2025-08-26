@@ -185,8 +185,6 @@ const SnowBored = () => {
   const [wizardAbilityCooldown, setWizardAbilityCooldown] = useState(0)
   const [wizardRecharging, setWizardRecharging] = useState(false)
 
-  const [leaderboardScores, setLeaderboardScores] = useState<Array<{ player_name: string; score: number }>>([])
-
   const [treasureCount, setTreasureCount] = useState(0)
   const [totalOKBEarned, setTotalOKBEarned] = useState(0)
   const [showRewardNotification, setShowRewardNotification] = useState(false)
@@ -765,9 +763,7 @@ const SnowBored = () => {
   }
 
   const handleScoreSave = (playerName: string, walletAddress?: string) => {
-    const newScore = { player_name: playerName, score: score }
-    setLeaderboardScores((prev) => [...prev, newScore].sort((a, b) => b.score - a.score).slice(0, 10))
-    console.log("Saving score:", { playerName, walletAddress, score })
+    console.log("Score saved:", { playerName, walletAddress, score })
     handleSaveScoreSuccess()
   }
 
@@ -1353,6 +1349,7 @@ const SnowBored = () => {
       {/* Top Navigation - removed connect wallet button */}
       <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-20">
         <div className="flex space-x-6">
+          {/* Use openLeaderboard function instead of inline onClick */}
           <button
             className="text-white hover:text-gray-300 transition-colors"
             style={{
@@ -1360,10 +1357,7 @@ const SnowBored = () => {
               fontSize: isMobile ? "12px" : "14px",
               textShadow: "1px 1px 2px rgba(0,0,0,0.8)",
             }}
-            onClick={() => {
-              playClickSound()
-              setShowLeaderboard(true)
-            }}
+            onClick={openLeaderboard}
           >
             排行榜
           </button>
@@ -1589,14 +1583,7 @@ const SnowBored = () => {
       )}
 
       {/* Leaderboard Modal */}
-      {showLeaderboard && (
-        <LeaderboardModal
-          onClose={closeLeaderboard}
-          isMobile={isMobile}
-          scores={leaderboardScores}
-          onRefresh={() => setLeaderboardScores([])}
-        />
-      )}
+      {showLeaderboard && <LeaderboardModal onClose={closeLeaderboard} isMobile={isMobile} />}
 
       {/* Updated save score functionality to properly handle score saving */}
       {showSaveScoreModal && (
